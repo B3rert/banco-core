@@ -8,7 +8,7 @@ namespace banco_core.Utilities
         public BancoContext(DbContextOptions<BancoContext> options) : base(options) { }
 
         // Define las tablas como propiedades DbSet
-        public DbSet<UsuarioModel> Clientes { get; set; }
+        public DbSet<UsuarioModel> Usuario { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
