@@ -1,4 +1,5 @@
 ﻿using banco_core.Modelo;
+using banco_core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace banco_core.Utilities
@@ -9,6 +10,7 @@ namespace banco_core.Utilities
 
         // Define las tablas como propiedades DbSet
         public DbSet<UsuarioModel> Usuario { get; set; }
+        public DbSet<RolModel> Rol { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -32,7 +32,7 @@ namespace banco_core.Controllers
                     return Ok(new RespondeModel()
                     {
                         Data = "El nombre de usuario ya está en uso.",
-                        Succes = false,
+                        Success = false,
                     });
                 }
 
@@ -42,7 +42,7 @@ namespace banco_core.Controllers
 
                 return Ok(new RespondeModel()
                 {
-                    Succes = true,
+                    Success = true,
                     Data = user,
                 });
             }
@@ -52,7 +52,7 @@ namespace banco_core.Controllers
                 return BadRequest(new RespondeModel()
                 {
                     Data=e.Message,
-                    Succes = false,
+                    Success = false,
                 });
 
             }
@@ -74,7 +74,7 @@ namespace banco_core.Controllers
                     return Ok(new RespondeModel()
                     {
                         Data = "Credenciales incorrectas",
-                        Succes = false
+                        Success = false
                     }); ;
                 }
 
@@ -109,7 +109,7 @@ namespace banco_core.Controllers
                 // Si todo es correcto, puedes devolver el usuario o un token de autenticación
                 return Ok(new RespondeModel()
                 {
-                    Succes = true,
+                    Success = true,
                     Data = usuario,
                 });
             }
@@ -119,7 +119,7 @@ namespace banco_core.Controllers
                 return BadRequest(new RespondeModel()
                 {
                     Data= e.Message,
-                    Succes = false,
+                    Success = false,
                 });
             }
         }
