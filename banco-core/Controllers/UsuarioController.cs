@@ -1,4 +1,5 @@
-﻿using banco_core.Models;
+﻿using banco_core.Modelo;
+using banco_core.Models;
 using banco_core.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,62 +15,113 @@ namespace banco_core.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsuarioController : ControllerBase
+    public class UsuarioController(BancoContext context, IConfiguration configuration) : ControllerBase
     {
-        private readonly BancoContext _context;
-        private readonly IConfiguration _config;
+        private readonly BancoContext _context = context;
+        private readonly IConfiguration _config = configuration;
 
 
-        public UsuarioController(BancoContext context, IConfiguration configuration)
+        [HttpPost("crear")]
+        public async Task<IActionResult> CrearUsuario([FromBody] UsuarioModel user)
         {
-            _context = context;
-            _config = configuration;
+            try
+            {
+                // Verifica si el nombre de usuario ya está en uso
+                if (await _context.Usuario.AnyAsync(u => u.Usuario == user.Usuario || u.Correo == user.Correo))
+                {
+                    return Ok(new RespondeModel()
+                    {
+                        Data = "El nombre de usuario ya está en uso.",
+                        Succes = false,
+                    });
+                }
 
+                // Agrega el nuevo usuario al contexto
+                _context.Usuario.Add(user);
+                await _context.SaveChangesAsync(); // Guarda los cambios en la base de datos
+
+                return Ok(new RespondeModel()
+                {
+                    Succes = true,
+                    Data = user,
+                });
+            }
+            catch (Exception e)
+            {
+
+                return BadRequest(new RespondeModel()
+                {
+                    Data=e.Message,
+                    Succes = false,
+                });
+
+            }
         }
-
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel loginRequest)
         {
-            // Busca al usuario por su nombre de usuario
-            var usuario = await _context.Usuario
-                .FirstOrDefaultAsync(u => u.Usuario == loginRequest.User || u.Correo == loginRequest.User);
-
-            // Verifica si el usuario existe y si la contraseña es correcta
-            if (usuario == null || usuario.Clave != loginRequest.Password)
+            try
             {
-                // Si el usuario no existe o la contraseña es incorrecta, retorna 401 Unauthorized
-                return Unauthorized(new { message = "Credenciales incorrectas" });
+                // Busca al usuario por su nombre de usuario
+                var usuario = await _context.Usuario
+                    .FirstOrDefaultAsync(u => u.Usuario == loginRequest.User || u.Correo == loginRequest.User);
+
+                // Verifica si el usuario existe y si la contraseña es correcta
+                if (usuario == null || usuario.Clave != loginRequest.Password)
+                {
+                    // Si el usuario no existe o la contraseña es incorrecta, retorna 401 Unauthorized
+                    return Ok(new RespondeModel()
+                    {
+                        Data = "Credenciales incorrectas",
+                        Succes = false
+                    }); ;
+                }
+
+
+
+                //Crear llave secreta para token
+                var secretKey = _config.GetValue<string>("SecretKey");
+                var key = Encoding.ASCII.GetBytes(secretKey);
+
+                //Agregar contenido token
+                var claims = new ClaimsIdentity();
+                claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, loginRequest.User!));
+
+                //Configurar token
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = claims,
+                    Expires = DateTime.UtcNow.AddDays(360),
+
+                    SigningCredentials = new SigningCredentials(
+                        new SymmetricSecurityKey(key),
+                        SecurityAlgorithms.HmacSha256Signature)
+                };
+
+                //Crear token
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var createdToken = tokenHandler.CreateToken(tokenDescriptor);
+                var barerToken = tokenHandler.WriteToken(createdToken);
+
+                usuario.Clave = barerToken;
+
+                // Si todo es correcto, puedes devolver el usuario o un token de autenticación
+                return Ok(new RespondeModel()
+                {
+                    Succes = true,
+                    Data = usuario,
+                });
             }
-
-
-
-            //Crear llave secreta para token
-            var secretKey = _config.GetValue<string>("SecretKey");
-            var key = Encoding.ASCII.GetBytes(secretKey);
-
-            //Agregar contenido token
-            var claims = new ClaimsIdentity();
-            claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, loginRequest.User!));
-
-            //Configurar token
-            var tokenDescriptor = new SecurityTokenDescriptor
+            catch (Exception e)
             {
-                Subject = claims,
-                Expires = DateTime.UtcNow.AddDays(360),
 
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            //Crear token
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var createdToken = tokenHandler.CreateToken(tokenDescriptor);
-            var barerToken = tokenHandler.WriteToken(createdToken);
-
-            // Si todo es correcto, puedes devolver el usuario o un token de autenticación
-            return Ok(new { message = "Login exitoso", usuario.Usuario, usuario.Rol_Id});
+                return BadRequest(new RespondeModel()
+                {
+                    Data= e.Message,
+                    Succes = false,
+                });
+            }
         }
     }
 }
