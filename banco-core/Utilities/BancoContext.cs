@@ -11,6 +11,7 @@ namespace banco_core.Utilities
         // Define las tablas como propiedades DbSet
         public DbSet<UsuarioModel> Usuario { get; set; }
         public DbSet<RolModel> Rol { get; set; }
+        public DbSet<CuentaModel> Cuenta { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

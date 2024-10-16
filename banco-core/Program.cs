@@ -1,9 +1,10 @@
-using banco_core.Utilities;
+﻿using banco_core.Utilities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using banco_core.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,5 +70,6 @@ app.UseAuthorization();
 app.UseAuthentication();
 
 app.MapControllers();
+
 
 app.Run();
