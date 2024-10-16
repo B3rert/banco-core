@@ -6,7 +6,7 @@
             public string? Usuario { get; set; }
             public string? Clave { get; set; }
             public string? Correo { get; set; }
-            public int Rol_Id { get; set; }
+            public int? Rol_Id { get; set; }
 
     }
 

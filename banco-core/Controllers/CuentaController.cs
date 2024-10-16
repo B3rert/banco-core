@@ -1,42 +1,34 @@
 ﻿using banco_core.Models;
+using banco_core.Procedures;
 using banco_core.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WireMock.Admin.Mappings;
 
 namespace banco_core.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class CuentaController(BancoContext context) : ControllerBase
+    public class CuentaController(IConfiguration configuration, BancoContext context) : ControllerBase
     {
-        private readonly BancoContext _context = context;
 
-    [HttpPost()]
-    public async Task<IActionResult> CrearCuenta([FromBody] CuentaModel cuenta)
+        //Servicion con el consumo de los procedimientos
+        private readonly Sp_InsertarCuenta _Sp_InsertarCuenta = new(configuration);
+
+        [HttpPost()]
+        public async Task<IActionResult> CrearCuenta([FromBody] CuentaModel cuenta)
         {
-            // Verifica si ya existe una cuenta con el mismo número de cuenta
-            if (await _context.Cuenta.AnyAsync(c => c.Numero_cuenta == cuenta.Numero_cuenta))
-            {
-                return Ok(new RespondeModel()
-                {
-                    Success = false,
-                    Data    = "El número de cuenta ya está en uso.",
-                });
-            }
+            //Consumo del procedimiento
+            RespondeModel response = await _Sp_InsertarCuenta.SpExcecute(cuenta);
 
-           
-            // Agrega la nueva cuenta al contexto
-            _context.Cuenta.Add(cuenta);
-            await _context.SaveChangesAsync(); // Guarda los cambios en la base de datos
 
-            return CreatedAtAction(nameof(CrearCuenta), new RespondeModel()
-            {
-                Data  = cuenta,
-                Success = true,
-            });
+            //respuesta correcta 200
+            if (response.Success) return Ok(response);
+
+            //respuest aincorrecta 400
+            return BadRequest(response);
         }
 
         // Endpoint para obtener las cuentas de un cliente específico
@@ -46,14 +38,14 @@ namespace banco_core.Controllers
             try
             {
                 // Obtiene las cuentas del cliente con el clienteId
-                var cuentas = await _context.Cuenta
+                var cuentas = await context.Cuenta
                     .Where(c => c.Cliente_id == clienteId)
                     .ToListAsync();
 
                 // Si no se encuentran cuentas, devuelve un error 404
                 if (cuentas == null || cuentas.Count == 0)
                 {
-                    return Ok( new RespondeModel()
+                    return Ok(new RespondeModel()
                     {
                         Data = new List<CuentaModel>(),
                         Success = true,

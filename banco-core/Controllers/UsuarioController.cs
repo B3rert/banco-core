@@ -1,6 +1,7 @@
 ﻿using banco_core.Modelo;
 using banco_core.Models;
 using banco_core.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

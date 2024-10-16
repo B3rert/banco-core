@@ -12,6 +12,7 @@ namespace banco_core.Utilities
         public DbSet<UsuarioModel> Usuario { get; set; }
         public DbSet<RolModel> Rol { get; set; }
         public DbSet<CuentaModel> Cuenta { get; set; }
+        public DbSet<ClienteModel> Cliente { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
