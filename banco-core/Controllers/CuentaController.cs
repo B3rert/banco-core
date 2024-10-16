@@ -1,11 +1,8 @@
 ﻿using banco_core.Models;
 using banco_core.Procedures;
 using banco_core.Utilities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WireMock.Admin.Mappings;
 
 namespace banco_core.Controllers
 {
@@ -25,7 +22,15 @@ namespace banco_core.Controllers
 
 
             //respuesta correcta 200
-            if (response.Success) return Ok(response);
+            if (response.Success) {
+
+                List<CuentaModel>? cuentas = response.Data as List<CuentaModel>;
+
+                response.Data = cuentas![0];
+
+                return Ok(response);
+
+            };
 
             //respuest aincorrecta 400
             return BadRequest(response);
