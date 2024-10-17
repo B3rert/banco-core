@@ -23,41 +23,81 @@ namespace banco_core.Controllers
 
 
         [HttpPost("crear")]
-        public async Task<IActionResult> CrearUsuario([FromBody] UsuarioModel user)
+        public async Task<IActionResult> CrearUsuario([FromBody] NewUserModel user)
         {
             try
             {
-                // Verifica si el nombre de usuario ya está en uso
-                if (await _context.Usuario.AnyAsync(u => u.Usuario == user.Usuario || u.Correo == user.Correo))
+                // Validar si los campos de nombres y apellidos no están vacíos
+                if (string.IsNullOrEmpty(user.Nombre) || string.IsNullOrEmpty(user.Apellido))
                 {
-                    return Ok(new RespondeModel()
+                    return BadRequest(new RespondeModel()
                     {
-                        Data = "El nombre de usuario ya está en uso.",
+                        Data = "El nombre y el apellido son obligatorios.",
                         Success = false,
                     });
                 }
 
-                // Agrega el nuevo usuario al contexto
-                _context.Usuario.Add(user);
+                // Generar un nombre de usuario único
+                string nuevoUsuario = await GenerarNombreDeUsuario(user.Nombre, user.Apellido);
+
+                // Generar una contraseña segura
+                string nuevaContrasena = GenerarContrasenaSegura();
+
+
+                UsuarioModel usuario = new()
+                {
+                    Clave = nuevaContrasena,
+                    Rol_Id = user.Rol,
+                    Usuario = nuevoUsuario,
+                };
+
+
+                // Agregar el nuevo usuario al contexto
+                _context.Usuario.Add(usuario);
                 await _context.SaveChangesAsync(); // Guarda los cambios en la base de datos
 
                 return Ok(new RespondeModel()
                 {
                     Success = true,
-                    Data = user,
+                    Data = usuario, // Devolver usuario y contraseña generados
                 });
             }
             catch (Exception e)
             {
-
                 return BadRequest(new RespondeModel()
                 {
-                    Data=e.Message,
+                    Data = e.Message,
                     Success = false,
                 });
-
             }
         }
+
+        // Método para generar nombre de usuario
+        private async Task<string> GenerarNombreDeUsuario(string nombre, string apellido)
+        {
+            string usuarioBase = nombre.Substring(0, 1).ToLower() + apellido.ToLower(); // Ejemplo: jperez
+            string nuevoUsuario = usuarioBase;
+            int contador = 1;
+
+            // Verificar si el usuario ya existe y seguir incrementando el número si es necesario
+            while (await _context.Usuario.AnyAsync(u => u.Usuario == nuevoUsuario))
+            {
+                nuevoUsuario = usuarioBase + contador.ToString(); // Ejemplo: jperez1, jperez2
+                contador++;
+            }
+
+            return nuevoUsuario;
+        }
+
+        // Método para generar una contraseña segura
+        private string GenerarContrasenaSegura()
+        {
+            const string caracteres = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
+            Random random = new Random();
+            return new string(Enumerable.Repeat(caracteres, 8)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel loginRequest)
@@ -66,7 +106,7 @@ namespace banco_core.Controllers
             {
                 // Busca al usuario por su nombre de usuario
                 var usuario = await _context.Usuario
-                    .FirstOrDefaultAsync(u => u.Usuario == loginRequest.User || u.Correo == loginRequest.User);
+                    .FirstOrDefaultAsync(u => u.Usuario == loginRequest.User);
 
                 // Verifica si el usuario existe y si la contraseña es correcta
                 if (usuario == null || usuario.Clave != loginRequest.Password)
@@ -119,7 +159,7 @@ namespace banco_core.Controllers
 
                 return BadRequest(new RespondeModel()
                 {
-                    Data= e.Message,
+                    Data = e.Message,
                     Success = false,
                 });
             }

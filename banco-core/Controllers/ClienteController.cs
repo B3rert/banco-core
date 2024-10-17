@@ -11,6 +11,43 @@ namespace banco_core.Controllers
     [ApiController]
     public class ClienteController(BancoContext context) : ControllerBase
     {
+
+        [HttpGet("{dpi}")]
+        public async Task<IActionResult> ObtenerClientePorDpi(string dpi)
+        {
+            
+            try
+            {
+                // Buscar al cliente por su DPI
+                var cliente = await context.Cliente
+                    .FirstOrDefaultAsync(c => c.Dpi == dpi);
+
+                if (cliente == null)
+                {
+                    return Ok(new RespondeModel()
+                    {
+                        Data = "Cliente no encontrado.",
+                        Success = false,
+                    });
+                }
+
+                return Ok(new RespondeModel()
+                {
+                    Success = true,
+                    Data    = cliente,
+                }); // Devuelve el cliente si se encuentra
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new RespondeModel()
+                {
+                    Data= e.Message,
+                    Success = false,
+                });
+            }
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> CrearCliente([FromBody] ClienteModel cliente)
         {
