@@ -40,7 +40,11 @@ namespace banco_core.Controllers
             }
             catch (Exception e)
             {
-                return StatusCode(500, new { mensaje = "Error interno del servidor.", detalle = e.Message });
+                return BadRequest(new RespondeModel()
+                {
+                    Data = e.Message,
+                    Success = false,
+                });
             }
         }
 
