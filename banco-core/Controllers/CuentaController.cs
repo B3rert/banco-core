@@ -13,8 +13,27 @@ namespace banco_core.Controllers
 
         //Servicion con el consumo de los procedimientos
         private readonly Sp_InsertarCuenta _Sp_InsertarCuenta = new(configuration);
+        private readonly Sp_ObtenerCuentasPorUsuario _SP_ObtenerCuentasPorUsuario = new(configuration);
 
-        [HttpGet ("tipo")]
+
+        [HttpGet("usuario/{usuario}")]
+        public async Task<IActionResult> ObtenerCuentasPorUsuario(string usuario)
+        {
+
+            //Consumo del procedimiento
+            RespondeModel response = await _SP_ObtenerCuentasPorUsuario.SpExcecute(usuario);
+
+
+            //respuesta correcta 200
+            if (response.Success)
+
+                return Ok(response);
+
+            //respuest aincorrecta 400
+            return BadRequest(response);
+        }
+
+        [HttpGet("tipo")]
         public async Task<IActionResult> ObtenerTiposDeCuenta()
         {
             try
@@ -27,7 +46,7 @@ namespace banco_core.Controllers
                 {
                     return Ok(new RespondeModel()
                     {
-                        Data  = new List<TipoCuentaModel>(),
+                        Data = new List<TipoCuentaModel>(),
                         Success = true,
                     });
                 }
@@ -56,7 +75,8 @@ namespace banco_core.Controllers
 
 
             //respuesta correcta 200
-            if (response.Success) {
+            if (response.Success)
+            {
 
                 List<CuentaModel>? cuentas = response.Data as List<CuentaModel>;
 
@@ -70,6 +90,6 @@ namespace banco_core.Controllers
             return BadRequest(response);
         }
 
-      
+
     }
 }
