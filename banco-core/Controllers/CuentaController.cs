@@ -14,6 +14,36 @@ namespace banco_core.Controllers
         //Servicion con el consumo de los procedimientos
         private readonly Sp_InsertarCuenta _Sp_InsertarCuenta = new(configuration);
 
+        [HttpGet ("tipo")]
+        public async Task<IActionResult> ObtenerTiposDeCuenta()
+        {
+            try
+            {
+                // Obtiene todos los tipos de cuenta de la base de datos
+                var tiposCuenta = await context.Tipo_Cuenta.ToListAsync();
+
+                // Verifica si la lista está vacía
+                if (tiposCuenta == null || tiposCuenta.Count == 0)
+                {
+                    return Ok(new RespondeModel()
+                    {
+                        Data  = new List<TipoCuentaModel>(),
+                        Success = true,
+                    });
+                }
+
+                return Ok(new RespondeModel()
+                {
+                    Success = true,
+                    Data = tiposCuenta,
+                });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new { mensaje = "Error interno del servidor.", detalle = e.Message });
+            }
+        }
+
         [HttpPost()]
         public async Task<IActionResult> CrearCuenta([FromBody] CuentaModel cuenta)
         {

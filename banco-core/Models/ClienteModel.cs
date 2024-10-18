@@ -10,5 +10,6 @@
         public string? Direccion { get; set; }
         public string? Telefono { get; set; }
         public int? Usuario_id { get; set; }
+        public string? Correo { get; set; }
     }
 }

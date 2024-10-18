@@ -69,7 +69,7 @@ namespace banco_core.Controllers
 
                 if (dpiExistente)
                 {
-                    return Ok(new RespondeModel()
+                    return BadRequest(new RespondeModel()
                     {
                         Data = "El DPI ya existe.",
                         Success = false,
