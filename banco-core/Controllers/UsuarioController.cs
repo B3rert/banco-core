@@ -1,5 +1,6 @@
 ﻿using banco_core.Modelo;
 using banco_core.Models;
+using banco_core.Procedures;
 using banco_core.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,61 +22,58 @@ namespace banco_core.Controllers
         private readonly BancoContext _context = context;
         private readonly IConfiguration _config = configuration;
 
+        //Servicion con el consumo de los procedimientos
+        private readonly Sp_CrearUsuario _SpCrearUsuario = new(configuration);
 
         [HttpPost("crear")]
         public async Task<IActionResult> CrearUsuario([FromBody] NewUserModel user)
         {
-            try
+
+            // Generar un nombre de usuario único
+            string nuevoUsuario = await GenerarNombreDeUsuario(user.Nombre!, user.Apellido!);
+
+            // Generar una contraseña segura
+            string nuevaContrasena = GenerarContrasenaSegura();
+
+
+            UsuarioModel usuario = new()
             {
-                // Validar si los campos de nombres y apellidos no están vacíos
-                if (string.IsNullOrEmpty(user.Nombre) || string.IsNullOrEmpty(user.Apellido))
-                {
-                    return BadRequest(new RespondeModel()
-                    {
-                        Data = "El nombre y el apellido son obligatorios.",
-                        Success = false,
-                    });
-                }
-
-                // Generar un nombre de usuario único
-                string nuevoUsuario = await GenerarNombreDeUsuario(user.Nombre, user.Apellido);
-
-                // Generar una contraseña segura
-                string nuevaContrasena = GenerarContrasenaSegura();
+                Clave = nuevaContrasena,
+                Rol_Id = user.Rol,
+                Usuario = nuevoUsuario,
+            };
 
 
-                UsuarioModel usuario = new()
-                {
-                    Clave = nuevaContrasena,
-                    Rol_Id = user.Rol,
-                    Usuario = nuevoUsuario,
-                };
+            //Consumo del procedimiento
+            RespondeModel response = await _SpCrearUsuario.SpExcecute(usuario);
 
 
-                // Agregar el nuevo usuario al contexto
-                _context.Usuario.Add(usuario);
-                await _context.SaveChangesAsync(); // Guarda los cambios en la base de datos
-
-                return Ok(new RespondeModel()
-                {
-                    Success = true,
-                    Data = usuario, // Devolver usuario y contraseña generados
-                });
-            }
-            catch (Exception e)
+            //respuesta correcta 200
+            if (response.Success)
             {
-                return BadRequest(new RespondeModel()
-                {
-                    Data = e.Message,
-                    Success = false,
-                });
-            }
+
+                List<UsuarioModel>? usuarios = response.Data as List<UsuarioModel>;
+
+                response.Data = usuarios![0];
+
+                return Ok(response);
+
+            };
+
+            //respuest aincorrecta 400
+            return BadRequest(response);
+           
         }
 
         // Método para generar nombre de usuario
         private async Task<string> GenerarNombreDeUsuario(string nombre, string apellido)
         {
-            string usuarioBase = nombre.Substring(0, 1).ToLower() + apellido.ToLower(); // Ejemplo: jperez
+            // Dividir las cadenas y tomar solo la primera palabra de cada una
+            string primeraParteNombre = nombre.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0].ToLower();
+            string primeraParteApellido = apellido.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0].ToLower();
+
+            // Crear el nombre de usuario base
+            string usuarioBase = primeraParteNombre.Substring(0, 1) + primeraParteApellido; // Ejemplo: jperez
             string nuevoUsuario = usuarioBase;
             int contador = 1;
 
@@ -88,6 +86,7 @@ namespace banco_core.Controllers
 
             return nuevoUsuario;
         }
+
 
         // Método para generar una contraseña segura
         private string GenerarContrasenaSegura()
