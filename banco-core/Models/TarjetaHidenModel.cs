@@ -10,6 +10,7 @@ namespace banco_core.Models
         public string? Numero_cuenta { get; set; }
         public string? Numero_tarjeta { get; set; }
         public string? Tipo_tarjeta { get; set; }
+        public int? Estado_id{ get; set; }
         public string? Estado_tarjeta { get; set; }
         public decimal? Saldo { get; set; }
         public string? Nombre { get; set; }
@@ -27,6 +28,7 @@ namespace banco_core.Models
                 Numero_cuenta = reader.GetValueOrDefault<string?>("numero_cuenta"),
                 Numero_tarjeta = reader.GetValueOrDefault<string?>("numero_tarjeta"),
                 Tipo_tarjeta = reader.GetValueOrDefault<string?>("tipo_tarjeta"),
+                Estado_id = reader.GetValueOrDefault<int?>("estado_id"),
                 Estado_tarjeta = reader.GetValueOrDefault<string?>("estado_tarjeta"),
                 Saldo = reader.GetValueOrDefault<decimal?>("saldo"),
                 Nombre= reader.GetValueOrDefault<string>("nombre"),

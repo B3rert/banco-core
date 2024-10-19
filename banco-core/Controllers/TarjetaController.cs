@@ -4,6 +4,7 @@ using banco_core.Procedures;
 using banco_core.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace banco_core.Controllers
 {
@@ -15,7 +16,44 @@ namespace banco_core.Controllers
         private readonly Sp_ObtenerTarjetasPorUsuario _Sp_ObtenerTarjetasPorUsuario = new(configuration);
         private readonly Sp_ObtenerTarjetaPorId _Sp_ObtenerTarjetaPorId = new(configuration);
 
+        [HttpPut("estado")]
+        public async Task<IActionResult> ActualizarEstado([FromBody] CardStatusModel status)
+        {
+            try
+            {
+                // Busca la tarjeta por su ID
+                var tarjeta = await context.Tarjeta.FindAsync(status.id);
+                if (tarjeta == null)
+                {
+                    return NotFound(new RespondeModel()
+                    {
+                        Data = "Tarjeta no encontrada.",
+                        Success = false
+                    });
+                }
 
+                // Actualiza el campo Estado
+                tarjeta.Estado_id = status.estado;
+
+                // Guarda los cambios en la base de datos
+                await context.SaveChangesAsync();
+
+                return Ok(new RespondeModel()
+                {
+                    Success = true,
+                    Data    = "Estado de la tarjeta actualizado exitosamente."
+                });
+            }
+            catch (Exception e)
+            {
+                return  BadRequest(new RespondeModel()
+                {
+                    Data= e.Message,
+                    Success = false,
+                    
+                });
+            }
+        }
 
         [HttpGet("id/{id}")]
         public async Task<IActionResult> ObtnerTarjetaPorUsuario(int id)
