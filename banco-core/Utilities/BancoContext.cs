@@ -15,6 +15,7 @@ namespace banco_core.Utilities
         public DbSet<TipoCuentaModel> Tipo_Cuenta { get; set; }
         public DbSet<TransaccionModel> Transaccion { get; set; }
         public DbSet<TarjetaModel> Tarjeta { get; set; }
+        public DbSet<TipoTransaccionModel> Tipo_Transaccion { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
