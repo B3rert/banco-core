@@ -15,7 +15,28 @@ namespace banco_core.Controllers
         private readonly Sp_InsertarCuenta _Sp_InsertarCuenta = new(configuration);
         private readonly Sp_ObtenerCuentasPorUsuario _SP_ObtenerCuentasPorUsuario = new(configuration);
         private readonly Sp_ObtenerCuentaPorNumero _Sp_ObtenerCuentaPorNumero = new(configuration);
+        private readonly Sp_ObtenerCuentaPorNumeroDPI _Sp_ObtenerCuentaPorNumeroDPI = new(configuration);
 
+
+        [HttpGet("dpi/{cuenta}/{dpi}")]
+        public async Task<IActionResult> ObtenerCuentasPorNumeroDpi(string cuenta, string dpi)
+        {
+
+            //Consumo del procedimiento
+            RespondeModel response = await _Sp_ObtenerCuentaPorNumeroDPI.SpExcecute(
+                cuenta,
+                dpi
+                );
+
+
+            //respuesta correcta 200
+            if (response.Success)
+
+                return Ok(response);
+
+            //respuest aincorrecta 400
+            return BadRequest(response);
+        }
 
         [HttpGet("numero/{cuenta}")]
         public async Task<IActionResult> ObtenerCuentasPorNumero(string cuenta)
