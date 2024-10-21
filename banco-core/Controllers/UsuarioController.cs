@@ -25,6 +25,42 @@ namespace banco_core.Controllers
         //Servicion con el consumo de los procedimientos
         private readonly Sp_CrearUsuario _SpCrearUsuario = new(configuration);
 
+        // Método para actualizar la clave y el estado de un usuario
+        [HttpPut()]
+        public async Task<IActionResult> ActualizarClaveYEstado([FromBody] UpdateUserModel user)
+        {
+            // Buscar el usuario por ID
+            var usuario = await _context.Usuario.FindAsync(user.id);
+
+            if (usuario == null)
+            {
+                return NotFound("Usuario no encontrado.");
+            }
+
+            // Actualizar la clave y el estado
+            usuario.Clave = user.password;
+            usuario.Estado = true;
+
+            // Guardar los cambios
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok(new RespondeModel()
+                {
+                    Data = "Usuario actualizado correctamente.",
+                    Success = true,
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new RespondeModel()
+                {
+                    Success = false,
+                    Data = ex.Message
+                });
+            }
+        }
+
         [HttpPost("crear")]
         public async Task<IActionResult> CrearUsuario([FromBody] NewUserModel user)
         {

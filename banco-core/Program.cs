@@ -56,9 +56,9 @@ if (app.Environment.IsDevelopment())
 app.UseCors(opctions =>
 {
     opctions.WithOrigins("*");
-    opctions.AllowAnyMethod();
     opctions.AllowAnyHeader();
     opctions.WithMethods("PUT", "GET", "POST", "DELETE");
+    opctions.AllowAnyMethod();
     opctions.AllowAnyOrigin();
 });
 
