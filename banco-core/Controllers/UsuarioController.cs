@@ -26,7 +26,7 @@ namespace banco_core.Controllers
         private readonly Sp_CrearUsuario _SpCrearUsuario = new(configuration);
 
         // Método para actualizar la clave y el estado de un usuario
-        [HttpPut()]
+        [HttpPost()]
         public async Task<IActionResult> ActualizarClaveYEstado([FromBody] UpdateUserModel user)
         {
             // Buscar el usuario por ID

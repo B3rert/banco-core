@@ -53,13 +53,11 @@ if (app.Environment.IsDevelopment())
 
 
 //Configurar cors
-app.UseCors(opctions =>
+app.UseCors(options =>
 {
-    opctions.WithOrigins("*");
-    opctions.AllowAnyHeader();
-    opctions.WithMethods("PUT", "GET", "POST", "DELETE");
-    opctions.AllowAnyMethod();
-    opctions.AllowAnyOrigin();
+    options.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
 });
 
 

@@ -16,7 +16,7 @@ namespace banco_core.Controllers
         private readonly Sp_ObtenerTarjetasPorUsuario _Sp_ObtenerTarjetasPorUsuario = new(configuration);
         private readonly Sp_ObtenerTarjetaPorId _Sp_ObtenerTarjetaPorId = new(configuration);
 
-        [HttpPut("estado")]
+        [HttpPost("estado")]
         public async Task<IActionResult> ActualizarEstado([FromBody] CardStatusModel status)
         {
             try
