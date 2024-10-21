@@ -14,6 +14,25 @@ namespace banco_core.Controllers
         //Servicion con el consumo de los procedimientos
         private readonly Sp_InsertarCuenta _Sp_InsertarCuenta = new(configuration);
         private readonly Sp_ObtenerCuentasPorUsuario _SP_ObtenerCuentasPorUsuario = new(configuration);
+        private readonly Sp_ObtenerCuentaPorNumero _Sp_ObtenerCuentaPorNumero = new(configuration);
+
+
+        [HttpGet("numero/{cuenta}")]
+        public async Task<IActionResult> ObtenerCuentasPorNumero(string cuenta)
+        {
+
+            //Consumo del procedimiento
+            RespondeModel response = await _Sp_ObtenerCuentaPorNumero.SpExcecute(cuenta);
+
+
+            //respuesta correcta 200
+            if (response.Success)
+
+                return Ok(response);
+
+            //respuest aincorrecta 400
+            return BadRequest(response);
+        }
 
 
         [HttpGet("usuario/{usuario}")]
