@@ -16,14 +16,40 @@ namespace banco_core.Controllers
 
         private readonly Sp_ObtenerTransaccionesMes _Sp_ObtenerTransaccionesMes = new(configuration);
         private readonly Sp_InsertarTransaccion _Sp_InsertarTransaccion = new(configuration);
+        private readonly Sp_ObtenerTransaccionesPorRangoDeFechas _Sp_ObtenerTransaccionesPorRangoDeFechas = new(configuration);
+
+        [HttpGet("rango")]
+        public async Task<IActionResult> ObtenerTransaccionesPorIdCuentaYRangoFecha(
+            [FromHeader] int idCuenta,
+            [FromHeader] DateTime incio,
+            [FromHeader] DateTime fin
+            )
+        {
+            //Consumo del procedimiento
+            RespondeModel response = await _Sp_ObtenerTransaccionesPorRangoDeFechas.SpExcecute(
+                account: idCuenta,
+                incio: incio,
+                fin: fin
+                );
+
+
+            //respuesta correcta 200
+            if (response.Success)
+
+                return Ok(response);
+
+            //respuest aincorrecta 400
+            return BadRequest(response);
+        }
+
 
         [HttpGet("Tipo")]
         public async Task<IActionResult> ObtenerTipoTransaccion()
         {
             try
             {
-                var tipos= await context.Tipo_Transaccion.ToListAsync();
-                if (tipos== null || tipos.Count == 0)
+                var tipos = await context.Tipo_Transaccion.ToListAsync();
+                if (tipos == null || tipos.Count == 0)
                 {
                     return Ok(new RespondeModel()
                     {
