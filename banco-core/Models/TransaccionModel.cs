@@ -13,6 +13,7 @@ namespace banco_core.Models
         public DateTime? Fecha { get; set; }
         public string? Descripcion { get; set; }
         public int? Realizado_por { get; set; }
+        public string? Numero_autorizacion { get; set; }
 
         public static TransaccionModel MapToModel(SqlDataReader reader)
         {
@@ -25,6 +26,7 @@ namespace banco_core.Models
                 Monto = reader.GetValueOrDefault<decimal>("Monto"),
                 Fecha = reader.GetValueOrDefault<DateTime>("Fecha"),
                 Descripcion = reader.GetValueOrDefault<string>("Descripcion"),
+                Numero_autorizacion = reader.GetValueOrDefault<string>("numero_autorizacion"),
                 Realizado_por = reader.GetValueOrDefault<int>("Realizado_por"),
             };
 
