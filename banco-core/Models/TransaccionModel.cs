@@ -26,7 +26,7 @@ namespace banco_core.Models
                 Monto = reader.GetValueOrDefault<decimal>("Monto"),
                 Fecha = reader.GetValueOrDefault<DateTime>("Fecha"),
                 Descripcion = reader.GetValueOrDefault<string>("Descripcion"),
-                Numero_autorizacion = reader.GetValueOrDefault<string>("numero_autorizacion"),
+                Numero_autorizacion = reader.GetValueOrDefault<string>("Numero_autorizacion"),
                 Realizado_por = reader.GetValueOrDefault<int>("Realizado_por"),
             };
 

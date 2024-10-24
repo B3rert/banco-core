@@ -14,7 +14,7 @@ namespace banco_core.Models
             public DateTime? Fecha_emision { get; set; }
             public DateTime? Fecha_vencimiento { get; set; }
             public int? Cvv { get; set; }
-            public int? Estado_id { get; set; } // Estado_id puede ser nulo
+            public int? Estado_id { get; set; }
 
 
 
