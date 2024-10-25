@@ -9,13 +9,13 @@ namespace banco_core.Procedures
     public class Sp_ObtenerCuentasPorUsuario(IConfiguration configuration) : StoredProcedureExecutor(configuration)
     {
         public async Task<RespondeModel> SpExcecute(
-           string user
+           int userId
            )
         {
             string storeProcedure = "sp_ObtenerCuentasPorUsuario";
             var parameters = new SqlParameter[]
            {
-                new("@usuario", SqlDbType.VarChar) {Value  = user},
+                new("@usuarioId", SqlDbType.Int) {Value  = userId},
            };
 
             //consumo y respuesta del procedimiento

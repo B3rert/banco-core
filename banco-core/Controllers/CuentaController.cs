@@ -77,12 +77,12 @@ namespace banco_core.Controllers
         }
 
 
-        [HttpGet("usuario/{usuario}")]
-        public async Task<IActionResult> ObtenerCuentasPorUsuario(string usuario)
+        [HttpGet("usuario/{id}")]
+        public async Task<IActionResult> ObtenerCuentasPorUsuario(int id)
         {
 
             //Consumo del procedimiento
-            RespondeModel response = await _SP_ObtenerCuentasPorUsuario.SpExcecute(usuario);
+            RespondeModel response = await _SP_ObtenerCuentasPorUsuario.SpExcecute(id);
 
 
             //respuesta correcta 200
