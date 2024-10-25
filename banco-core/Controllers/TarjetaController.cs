@@ -210,12 +210,12 @@ namespace banco_core.Controllers
             return BadRequest(response);
 
         }
-        [HttpGet("usuario/{usuario}")]
-        public async Task<IActionResult> ObtnerTarjetaPorUsuario(string usuario)
+        [HttpGet("usuario/{id}")]
+        public async Task<IActionResult> ObtnerTarjetaPorUsuarioHiden(int id)
         {
 
             //Consumo del procedimiento
-            RespondeModel response = await _Sp_ObtenerTarjetasPorUsuario.SpExcecute(usuario);
+            RespondeModel response = await _Sp_ObtenerTarjetasPorUsuario.SpExcecute(id);
 
 
             //respuesta correcta 200
