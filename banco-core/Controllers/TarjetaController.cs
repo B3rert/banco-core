@@ -27,8 +27,9 @@ namespace banco_core.Controllers
                 var card = await context.Tarjeta.FirstOrDefaultAsync(t =>
                     t.Numero_tarjeta == paymentRequest.CardNumber &&
                     t.Cvv == int.Parse(paymentRequest.CVV!) &&
-                     t.Fecha_vencimiento.HasValue &&
-                    t.Fecha_vencimiento.Value.Date == paymentRequest.ExpirationDate.Date);
+                    t.Fecha_vencimiento.HasValue &&
+                    t.Fecha_vencimiento.Value.Year == paymentRequest.ExpirationDate.Year &&
+                    t.Fecha_vencimiento.Value.Month == paymentRequest.ExpirationDate.Month);
 
                 if (card == null)
                 {

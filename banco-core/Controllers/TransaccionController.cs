@@ -17,6 +17,29 @@ namespace banco_core.Controllers
         private readonly Sp_ObtenerTransaccionesMes _Sp_ObtenerTransaccionesMes = new(configuration);
         private readonly Sp_InsertarTransaccion _Sp_InsertarTransaccion = new(configuration);
         private readonly Sp_ObtenerTransaccionesPorRangoDeFechas _Sp_ObtenerTransaccionesPorRangoDeFechas = new(configuration);
+        private readonly Sp_ObtenerTransaccionesPorAutorizacionYCredito Sp_ObtenerTransaccionesPorAutorizacionYCredito = new(configuration);
+
+
+        [HttpGet("{autorizacion}")]
+        public async Task<IActionResult> ValidarTransaccion(
+            string autorizacion
+         )
+        {
+            //Consumo del procedimiento
+            RespondeModel response = await Sp_ObtenerTransaccionesPorAutorizacionYCredito.SpExcecute(
+                autorizacion
+                );
+
+
+            //respuesta correcta 200
+            if (response.Success)
+
+                return Ok(response);
+
+            //respuest aincorrecta 400
+            return BadRequest(response);
+        }
+
 
         [HttpGet("rango")]
         public async Task<IActionResult> ObtenerTransaccionesPorIdCuentaYRangoFecha(
